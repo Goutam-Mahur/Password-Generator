@@ -9,19 +9,35 @@ function App() {
   const [password, setPassword] = useState("test");
   const [upperCase, setUpperCase] = useState(false);
   const [lowerCase, setLowerCase] = useState(false);
-  const [darkmode, setDarkMode] = useState(false);
+  const [darkmode, setDarkMode] = useState(
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
 
   const passwordRef = useRef(null);
 
   const handleToggle = () => {
-    document.documentElement.classList.toggle("dark");
-    setDarkMode((prev) => !prev);
+    setDarkMode((prev) => {
+      const newMode = !prev;
+      if (newMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      return newMode;
+    });
   };
+
+  useEffect(() => {
+    if (darkmode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkmode]);
 
   const passwordgenerator = useCallback(() => {
     let pass = "";
     let str = "";
-
     if (lowerCase) {
       str += "abcdefghijklmnopqrstuvwxyz";
     }
