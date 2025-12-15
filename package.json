@@ -5,7 +5,7 @@
   "homepage": "https://goutam-mahur.github.io/Password-Generator/",
   "type": "module",
   "scripts": {
-    "predeploy": "npm run build",
+    "predeploy": "pnpm run build",
     "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "vite build",
