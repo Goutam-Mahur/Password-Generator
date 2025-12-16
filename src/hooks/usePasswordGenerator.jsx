@@ -9,18 +9,48 @@ export function usePasswordGenerator() {
   const [password, setPassword] = useState("test");
 
   const generate = useCallback(() => {
-    let chars = "";
-    if (lowerCase) chars += "abcdefghijklmnopqrstuvwxyz";
-    if (upperCase) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    if (character) chars += "{}[]()!@#$%^&*_+-/";
-    if (number) chars += "0123456789";
+    const pools = [];
 
-    let pass = "";
-    for (let i = 0; i < length; i++) {
-      pass += chars[Math.floor(Math.random() * chars.length)];
+    if (lowerCase) pools.push("abcdefghijklmnopqrstuvwxyz");
+    if (upperCase) pools.push("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    if (number) pools.push("0123456789");
+    if (character) pools.push("{}[]()!@#$%^&*_+-/");
+
+    if (!pools.length || length <= 0) {
+      setPassword("");
+      return;
     }
-    setPassword(pass);
-  }, [length, number, character, lowerCase, upperCase]);
+
+    const res = [];
+
+    // shuffling the pools to ensure that in case len < options selected we get random
+    for (let i = pools.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pools[i], pools[j]] = [pools[j], pools[i]];
+    }
+
+    // compulsory inclusion (as much as length allows)
+    for (let i = 0; i < pools.length && res.length < length; i++) {
+      const p = pools[i];
+      res.push(p[Math.floor(Math.random() * p.length)]);
+    }
+
+    // merged pool
+    const all = pools.join("");
+
+    // fill remaining length
+    while (res.length < length) {
+      res.push(all[Math.floor(Math.random() * all.length)]);
+    }
+
+    // shuffle
+    for (let i = res.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [res[i], res[j]] = [res[j], res[i]];
+    }
+
+    setPassword(res.join(""));
+  }, [length, lowerCase, upperCase, number, character]);
 
   useEffect(() => {
     generate();
